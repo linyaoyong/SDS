@@ -1,0 +1,81 @@
+<!-- 我的收藏 -->
+<wxs module="helper">
+function resolveUrl(path) {
+  if (!path) return ''
+  if (path.indexOf('http') === 0 || path.indexOf('blob:') === 0) return path
+  if (path.indexOf('/api/') === 0) return path
+  if (path.indexOf('/') === 0) return 'http://localhost:8080/api' + path
+  return path
+}
+function formatPrice(price) {
+  if (price === undefined || price === null) return '0.00'
+  return (price * 1).toFixed(2)
+}
+function getConditionText(cond) {
+  if (cond === 10) return '全新'
+  if (cond === 9) return '99新'
+  if (cond === 8) return '95新'
+  if (cond === 7) return '9成新'
+  if (cond === 6) return '85新'
+  if (cond === 5) return '8成新'
+  if (cond === 4) return '7成新'
+  if (cond === 3) return '6成新'
+  if (cond === 2) return '5成新'
+  return '1成新'
+}
+module.exports = { resolveUrl: resolveUrl, formatPrice: formatPrice, getConditionText: getConditionText }
+</wxs>
+
+<view class="page-container">
+  <!-- 未登录 -->
+  <view wx:if="{{!isAuthenticated}}" class="text-center py-xl">
+    <text style="font-size: 80rpx;">❤️</text>
+    <view class="mt-md"><text class="text-secondary">请先登录</text></view>
+    <button class="btn btn-primary mx-auto mt-md" style="width: 320rpx;" bindtap="goLogin">去登录</button>
+  </view>
+
+  <!-- 收藏列表 -->
+  <view wx:elif="{{!loading && products.length > 0}}">
+    <view
+      wx:for="{{products}}"
+      wx:key="id"
+      class="card flex"
+      data-id="{{item.id}}"
+      bindtap="goDetail"
+    >
+      <image
+        wx:if="{{item.images && item.images.length > 0}}"
+        src="{{helper.resolveUrl(item.images[0])}}"
+        mode="aspectFill"
+        class="rounded-md"
+        style="width: 160rpx; height: 160rpx; flex-shrink: 0;"
+      />
+      <view wx:else class="rounded-md bg-bg flex items-center justify-center" style="width: 160rpx; height: 160rpx; flex-shrink: 0;">
+        <text style="font-size: 48rpx;">📦</text>
+      </view>
+      <view class="flex-1 ml-sm">
+        <text class="text-md font-semibold line-clamp-2">{{item.title}}</text>
+        <view class="flex items-center justify-between mt-sm">
+          <text class="text-lg font-bold price-primary">¥{{helper.formatPrice(item.price)}}</text>
+          <text class="text-xs text-tertiary">{{helper.getConditionText(item.condition)}}</text>
+        </view>
+        <view class="flex items-center justify-between mt-sm">
+          <text class="text-xs text-tertiary">{{item.sellerName || '匿名'}}</text>
+          <text class="text-xs tag tag-red" data-id="{{item.id}}" catchtap="removeFavorite">取消收藏</text>
+        </view>
+      </view>
+    </view>
+
+    <view wx:if="{{hasMore}}" class="text-center py-md" bindtap="loadFavorites">
+      <text class="text-sm text-primary">加载更多</text>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view wx:elif="{{!loading}}" class="text-center py-xl">
+    <text style="font-size: 80rpx;">💔</text>
+    <view class="mt-sm"><text class="text-secondary">暂无收藏</text></view>
+  </view>
+
+  <view wx:if="{{loading}}" class="text-center py-xl"><text class="text-secondary">加载中...</text></view>
+</view>

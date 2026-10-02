@@ -1,0 +1,80 @@
+<view class="page-container px-lg">
+  <!-- 标题 -->
+  <view class="text-center pt-lg mb-lg">
+    <text class="text-2xl font-bold text-primary">🎓 创建账号</text>
+  </view>
+  <view class="text-center mb-lg">
+    <text class="text-sm text-secondary">加入校园二手交易平台</text>
+  </view>
+
+  <!-- 表单卡片 -->
+  <view class="card">
+    <!-- 用户名 -->
+    <view class="mb-sm">
+      <view class="text-sm text-secondary mb-xs">用户名 *</view>
+      <input class="input" placeholder="4-20位字符" value="{{username}}" bindinput="onInput" data-field="username" maxlength="20"/>
+    </view>
+
+    <!-- 姓名 -->
+    <view class="mb-sm">
+      <view class="text-sm text-secondary mb-xs">姓名 *</view>
+      <input class="input" placeholder="真实姓名" value="{{name}}" bindinput="onInput" data-field="name" maxlength="20"/>
+    </view>
+
+    <!-- 学号 -->
+    <view class="mb-sm">
+      <view class="text-sm text-secondary mb-xs">学号 *</view>
+      <input class="input" placeholder="请输入学号" value="{{studentId}}" bindinput="onInput" data-field="studentId" maxlength="20"/>
+    </view>
+
+    <!-- 手机号 -->
+    <view class="mb-sm">
+      <view class="text-sm text-secondary mb-xs">手机号 *</view>
+      <input class="input" placeholder="11位手机号" value="{{phone}}" bindinput="onInput" data-field="phone" type="number" maxlength="11"/>
+    </view>
+
+    <!-- 邮箱 -->
+    <view class="mb-sm">
+      <view class="text-sm text-secondary mb-xs">邮箱 *</view>
+      <input class="input" placeholder="example@school.edu" value="{{email}}" bindinput="onInput" data-field="email" type="text" maxlength="50"/>
+    </view>
+
+    <!-- 密码 -->
+    <view class="mb-sm">
+      <view class="text-sm text-secondary mb-xs">密码 *</view>
+      <view class="relative">
+        <input class="input" placeholder="至少6位" value="{{password}}" bindinput="onInput" data-field="password" type="{{showPassword ? 'text' : 'password'}}" maxlength="30"/>
+        <view class="absolute flex items-center justify-center" style="right: 16rpx; top: 0; bottom: 0; width: 80rpx;" bindtap="togglePassword">
+          <text class="text-sm text-secondary">{{showPassword ? '隐藏' : '显示'}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 确认密码 -->
+    <view class="mb-md">
+      <view class="text-sm text-secondary mb-xs">确认密码 *</view>
+      <view class="relative">
+        <input class="input" placeholder="再次输入密码" value="{{confirmPassword}}" bindinput="onInput" data-field="confirmPassword" type="{{showConfirmPassword ? 'text' : 'password'}}" maxlength="30"/>
+        <view class="absolute flex items-center justify-center" style="right: 16rpx; top: 0; bottom: 0; width: 80rpx;" bindtap="toggleConfirmPassword">
+          <text class="text-sm text-secondary">{{showConfirmPassword ? '隐藏' : '显示'}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 错误信息 -->
+    <view wx:if="{{error}}" class="mb-md">
+      <text class="text-sm text-danger">{{error}}</text>
+    </view>
+
+    <!-- 注册按钮 -->
+    <button class="btn btn-primary w-full {{loading ? 'btn-disabled' : ''}}" bindtap="handleRegister" disabled="{{loading}}" loading="{{loading}}">
+      注册
+    </button>
+  </view>
+
+  <!-- 登录入口 -->
+  <view class="text-center mt-lg mb-xl">
+    <text class="text-sm text-secondary">已有账号？</text>
+    <text class="text-sm text-primary" bindtap="goLogin">返回登录</text>
+  </view>
+</view>

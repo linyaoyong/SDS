@@ -1,0 +1,86 @@
+<!-- 消息会话列表（对齐 frontend-v2） -->
+<wxs module="helper">
+function resolveUrl(path) {
+  if (!path) return ''
+  if (path.indexOf('http') === 0) return path
+  if (path.indexOf('/api/') === 0) return path
+  if (path.indexOf('/') === 0) return 'http://localhost:8080/api' + path
+  return path
+}
+function formatDate(d) {
+  if (!d) return ''
+  var date = getDate(d)
+  var now = getDate()
+  var diff = now.getTime() - date.getTime()
+  var minute = 60 * 1000
+  var hour = 60 * minute
+  var day = 24 * hour
+  if (diff < minute) return '刚刚'
+  if (diff < hour) return Math.floor(diff / minute) + '分钟前'
+  if (diff < day) return Math.floor(diff / hour) + '小时前'
+  if (diff < 7 * day) return Math.floor(diff / day) + '天前'
+  return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate()
+}
+function getBorderStyle(index) {
+  if (index > 0) return 'border-top: 1rpx solid var(--color-border);'
+  return ''
+}
+module.exports.resolveUrl = resolveUrl;
+module.exports.formatDate = formatDate;
+module.exports.getBorderStyle = getBorderStyle;
+</wxs>
+
+<view class="page-container">
+  <!-- 未登录 -->
+  <view wx:if="{{!isAuthenticated}}" class="text-center py-xl">
+    <text style="font-size: 80rpx;">💬</text>
+    <view class="mt-md"><text class="text-secondary">请先登录</text></view>
+    <button class="btn btn-primary mx-auto mt-md" style="width: 320rpx;" bindtap="goLogin">去登录</button>
+  </view>
+
+  <!-- 会话列表 -->
+  <view wx:elif="{{!loading && conversations.length > 0}}">
+    <view
+      wx:for="{{conversations}}"
+      wx:key="otherUser.id"
+      class="flex items-center px-md py-sm bg-white"
+      style="{{helper.getBorderStyle(index)}}"
+      data-user-id="{{item.otherUser.id}}"
+      data-product-id="{{item.product.id}}"
+      bindtap="goChat"
+    >
+      <view class="relative">
+        <image
+          wx:if="{{item.otherUser.avatar}}"
+          src="{{helper.resolveUrl(item.otherUser.avatar)}}"
+          class="rounded-full"
+          style="width: 96rpx; height: 96rpx;"
+        />
+        <view wx:else class="rounded-full bg-primary flex items-center justify-center" style="width: 96rpx; height: 96rpx;">
+          <text class="text-white text-lg font-bold">{{item.otherUser.name ? item.otherUser.name[0] : 'U'}}</text>
+        </view>
+        <!-- 未读红点（对齐 frontend-v2 移动端红点样式） -->
+        <view wx:if="{{item.unreadCount > 0}}" class="absolute bg-danger rounded-full" style="top: -4rpx; right: -4rpx; width: 16rpx; height: 16rpx; border: 2rpx solid #fff;"></view>
+      </view>
+      <view class="flex-1 ml-sm">
+        <view class="flex items-center justify-between">
+          <text class="text-md font-semibold">{{item.otherUser.name || '用户'}}</text>
+          <text class="text-xs text-tertiary">{{helper.formatDate(item.lastMessage.createdAt)}}</text>
+        </view>
+        <text class="text-xs text-tertiary">关于: {{item.product.title}}</text>
+        <text class="text-sm text-secondary truncate">{{item.lastMessage.content}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view wx:elif="{{!loading}}" class="text-center py-xl">
+    <text style="font-size: 80rpx;">💬</text>
+    <view class="mt-sm"><text class="text-secondary">暂无消息</text></view>
+  </view>
+
+  <!-- 加载中 -->
+  <view wx:if="{{loading}}" class="text-center py-xl">
+    <text class="text-secondary">加载中...</text>
+  </view>
+</view>

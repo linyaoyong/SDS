@@ -1,0 +1,72 @@
+<view class="page-container flex items-center justify-center" style="min-height: 100vh;">
+  <view class="login-box w-full px-lg">
+
+    <!-- Logo & 标题 -->
+    <view class="text-center mb-lg pt-xl">
+      <text class="text-2xl font-bold text-primary">🎓 校园二手交易</text>
+    </view>
+    <view class="text-center mb-lg">
+      <text class="text-lg font-semibold">欢迎回来</text>
+    </view>
+
+    <!-- 表单卡片 -->
+    <view class="card">
+      <!-- 账号 -->
+      <view class="mb-md">
+        <view class="text-sm text-secondary mb-sm">账号</view>
+        <input
+          class="input"
+          placeholder="用户名/手机号/邮箱/学号"
+          value="{{credential}}"
+          bindinput="onCredentialInput"
+          type="text"
+          maxlength="50"
+        />
+      </view>
+
+      <!-- 密码 -->
+      <view class="mb-md">
+        <view class="text-sm text-secondary mb-sm">密码</view>
+        <view class="relative">
+          <input
+            class="input"
+            placeholder="请输入密码"
+            value="{{password}}"
+            bindinput="onPasswordInput"
+            type="{{showPassword ? 'text' : 'password'}}"
+            maxlength="30"
+          />
+          <view
+            class="absolute flex items-center justify-center"
+            style="right: 16rpx; top: 0; bottom: 0; width: 80rpx;"
+            bindtap="togglePassword"
+          >
+            <text class="text-sm text-secondary">{{showPassword ? '隐藏' : '显示'}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 错误信息 -->
+      <view wx:if="{{error}}" class="mb-md">
+        <text class="text-sm text-danger">{{error}}</text>
+      </view>
+
+      <!-- 登录按钮 -->
+      <button
+        class="btn btn-primary w-full {{loading ? 'btn-disabled' : ''}}"
+        bindtap="handleLogin"
+        disabled="{{loading}}"
+        loading="{{loading}}"
+      >
+        登录
+      </button>
+    </view>
+
+    <!-- 注册入口 -->
+    <view class="text-center mt-lg">
+      <text class="text-sm text-secondary">还没有账号？</text>
+      <text class="text-sm text-primary" bindtap="goRegister">立即注册</text>
+    </view>
+
+  </view>
+</view>

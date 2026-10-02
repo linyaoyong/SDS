@@ -1,0 +1,95 @@
+<!-- 编辑商品 -->
+<view wx:if="{{loading}}" class="text-center py-xl"><text class="text-secondary">加载中...</text></view>
+
+<scroll-view wx:else scroll-y class="page-container" style="height:100vh;">
+  <view class="card">
+    <text class="text-lg font-bold mb-md">编辑商品</text>
+
+    <!-- 已有图片 -->
+    <view class="mb-md" wx:if="{{existingImages.length > 0}}">
+      <text class="text-sm text-secondary mb-sm">已有图片</text>
+      <view style="display:flex;flex-wrap:wrap;gap:12rpx;">
+        <view wx:for="{{existingImages}}" wx:key="*this" style="width:160rpx;height:160rpx;position:relative;border-radius:12rpx;overflow:hidden;">
+          <image src="{{item}}" mode="aspectFill" style="width:100%;height:100%;"/>
+          <view style="position:absolute;top:0;right:0;width:44rpx;height:44rpx;background:var(--color-danger);display:flex;align-items:center;justify-content:center;" data-index="{{index}}" catchtap="removeExistingImage">
+            <text style="color:#fff;font-size:22rpx;">✕</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 新图片 -->
+    <view class="mb-md">
+      <text class="text-sm text-secondary mb-sm">添加新图片</text>
+      <view style="display:flex;flex-wrap:wrap;gap:12rpx;">
+        <view wx:for="{{images}}" wx:key="*this" style="width:160rpx;height:160rpx;position:relative;border-radius:12rpx;overflow:hidden;">
+          <image src="{{item}}" mode="aspectFill" style="width:100%;height:100%;"/>
+          <view style="position:absolute;top:0;right:0;width:44rpx;height:44rpx;background:var(--color-danger);display:flex;align-items:center;justify-content:center;" data-index="{{index}}" catchtap="removeNewImage">
+            <text style="color:#fff;font-size:22rpx;">✕</text>
+          </view>
+        </view>
+        <view style="width:160rpx;height:160rpx;border:2rpx dashed var(--color-border);border-radius:12rpx;display:flex;flex-direction:column;align-items:center;justify-content:center;" bindtap="chooseImages">
+          <text style="font-size:48rpx;">+</text>
+          <text class="text-xs text-tertiary">添加</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 标题 -->
+    <view class="mb-md"><text class="text-sm text-secondary mb-xs">标题 *</text><input class="input" value="{{title}}" bindinput="onInput" data-field="title" maxlength="50"/></view>
+
+    <!-- 价格 -->
+    <view class="flex gap-sm mb-md">
+      <view class="flex-1"><text class="text-sm text-secondary mb-xs">价格 ¥ *</text><input class="input" value="{{price}}" type="digit" bindinput="onInput" data-field="price"/></view>
+      <view class="flex-1"><text class="text-sm text-secondary mb-xs">原价 ¥</text><input class="input" value="{{originalPrice}}" type="digit" bindinput="onInput" data-field="originalPrice"/></view>
+    </view>
+
+    <!-- 库存 -->
+    <view class="mb-md"><text class="text-sm text-secondary mb-xs">库存数量</text><input class="input" value="{{stockQuantity}}" type="number" bindinput="onInput" data-field="stockQuantity"/></view>
+
+    <!-- 成色 -->
+    <view class="mb-md"><text class="text-sm text-secondary mb-xs">成色</text>
+      <view class="input flex items-center justify-between" bindtap="cycleCondition"><text>{{conditionLabel}}</text><text class="text-tertiary">▾</text></view>
+    </view>
+
+    <!-- L1 分类 -->
+    <view class="mb-md" wx:if="{{parentCategories.length > 0}}">
+      <text class="text-sm text-secondary mb-xs">一级分类</text>
+      <scroll-view scroll-x style="white-space:nowrap;">
+        <text wx:for="{{parentCategories}}" wx:key="id" wx:for-item="c" class="inline-block px-sm py-xs rounded-full mr-xs text-sm" style="{{selectedParentId === c.id ? 'background:var(--color-primary);color:#fff;' : 'background:var(--color-bg);color:var(--color-text-secondary);'}}" data-id="{{c.id}}" data-name="{{c.name}}" catchtap="selectParent">{{c.name}}</text>
+      </scroll-view>
+    </view>
+
+    <!-- L2 分类 -->
+    <view class="mb-md" wx:if="{{childCategories.length > 0}}">
+      <text class="text-sm text-secondary mb-xs">二级分类</text>
+      <scroll-view scroll-x style="white-space:nowrap;">
+        <text wx:for="{{childCategories}}" wx:key="id" wx:for-item="c" class="inline-block px-sm py-xs rounded-full mr-xs text-sm" style="{{selectedCategoryId === c.id ? 'background:var(--color-primary);color:#fff;' : 'background:var(--color-bg);color:var(--color-text-secondary);'}}" data-id="{{c.id}}" data-name="{{c.name}}" catchtap="selectChild">{{c.name}}</text>
+      </scroll-view>
+    </view>
+    <text wx:if="{{selectedCategoryName}}" class="text-xs text-primary mb-md">已选: {{selectedCategoryName}}</text>
+
+    <!-- 标签（+ 添加） -->
+    <view class="mb-md">
+      <text class="text-sm text-secondary mb-xs">标签</text>
+      <view style="display:flex;flex-wrap:wrap;gap:8rpx;margin-bottom:8rpx;">
+        <view wx:for="{{tags}}" wx:key="*this" class="tag tag-blue" style="padding-right:4rpx;">
+          <text>{{item}}</text>
+          <text style="margin-left:6rpx;font-size:20rpx;" data-index="{{index}}" catchtap="removeTag">✕</text>
+        </view>
+      </view>
+      <view class="flex items-center gap-sm">
+        <input class="input flex-1" style="height:64rpx;" placeholder="输入标签" value="{{tagInput}}" bindinput="onTagInput" bindconfirm="addTag" confirm-type="done" maxlength="15"/>
+        <view class="btn btn-primary" style="width:64rpx;height:64rpx;padding:0;border-radius:12rpx;flex-shrink:0;" bindtap="addTag"><text style="font-size:36rpx;">+</text></view>
+      </view>
+    </view>
+
+    <!-- 描述 -->
+    <view class="mb-md"><text class="text-sm text-secondary mb-xs">描述</text>
+      <textarea class="textarea" value="{{description}}" bindinput="onInput" data-field="description" maxlength="1000"/>
+    </view>
+
+    <!-- 提交 -->
+    <button class="btn btn-primary w-full mt-lg {{submitting ? 'btn-disabled' : ''}}" bindtap="handleSubmit" disabled="{{submitting}}" loading="{{submitting}}">保存修改</button>
+  </view>
+</scroll-view>

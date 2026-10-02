@@ -1,0 +1,84 @@
+server:
+  port: 8080
+  address: 0.0.0.0
+
+spring:
+  application:
+    name: gateway
+  main:
+    web-application-type: reactive
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+  codec:
+    max-in-memory-size: 10MB
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+        fail-fast: false
+        ip: 127.0.0.1
+      config:
+        server-addr: 127.0.0.1:8848
+        file-extension: yaml
+        import-check:
+          enabled: false
+    sentinel:
+      transport:
+        dashboard: 127.0.0.1:8089
+        port: 8719
+    gateway:
+      discovery:
+        locator:
+          enabled: false
+      routes:
+        - id: auth-service
+          uri: lb://auth-service
+          predicates:
+            - Path=/api/auth/**,/api/users/**,/api/addresses/**,/api/upload/avatar
+        - id: product-service
+          uri: lb://product-service
+          predicates:
+            - Path=/api/products/**,/api/categories/**,/api/favorites/**
+        - id: order-service
+          uri: lb://order-service
+          predicates:
+            - Path=/api/orders/**
+        - id: message-service
+          uri: lb://message-service
+          predicates:
+            - Path=/api/messages/**
+        - id: message-service-ws
+          uri: lb://message-service
+          predicates:
+            - Path=/ws/**
+        # Static files served by StaticResourceRouter
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOriginPatterns: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+            allowCredentials: true
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: 86400000
+
+internal:
+  token: ${INTERNAL_TOKEN}
+
+springdoc:
+  swagger-ui:
+    enabled: true
+    urls:
+      - name: auth-service
+        url: /v3/api-docs/auth
+      - name: product-service
+        url: /v3/api-docs/product
+      - name: order-service
+        url: /v3/api-docs/order
+      - name: message-service
+        url: /v3/api-docs/message

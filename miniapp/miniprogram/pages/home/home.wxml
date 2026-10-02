@@ -1,0 +1,151 @@
+<!-- 首页 -->
+<wxs module="helper">
+function resolveUrl(path) {
+  if (!path) return ''
+  if (path.indexOf('http') === 0 || path.indexOf('blob:') === 0) return path
+  if (path.indexOf('/api/') === 0) return path
+  if (path.indexOf('/') === 0) return 'http://localhost:8080/api' + path
+  return path
+}
+function formatPrice(price) {
+  if (price === undefined || price === null) return '0.00'
+  return (price * 1).toFixed(2)
+}
+function getConditionText(cond) {
+  if (cond === 10) return '全新'
+  if (cond === 9) return '99新'
+  if (cond === 8) return '95新'
+  if (cond === 7) return '9成新'
+  if (cond === 6) return '85新'
+  if (cond === 5) return '8成新'
+  if (cond === 4) return '7成新'
+  if (cond === 3) return '6成新'
+  if (cond === 2) return '5成新'
+  return '1成新'
+}
+function getGridStyle(index) {
+  if (index % 2 === 0) return 'margin-right: 8rpx;'
+  return 'margin-left: 8rpx;'
+}
+module.exports = { resolveUrl: resolveUrl, formatPrice: formatPrice, getConditionText: getConditionText, getGridStyle: getGridStyle }
+</wxs>
+
+<view class="page-container pb-lg">
+  <!-- 欢迎区 -->
+  <view class="px-md pt-lg pb-sm">
+    <view class="flex items-center justify-between">
+      <view>
+        <text class="text-2xl font-bold" style="background: linear-gradient(135deg, #3A7BFF, #7C3AED); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">📚 校园二手</text>
+      </view>
+      <view wx:if="{{!isAuthenticated}}" class="flex gap-sm">
+        <text class="text-primary text-sm" bindtap="goLogin">登录</text>
+        <text class="text-tertiary text-sm">/</text>
+        <text class="text-primary text-sm" bindtap="goRegister">注册</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 快捷操作入口（参考 frontend-v2 Home 页面） -->
+  <view class="flex px-md gap-sm py-md">
+    <view class="flex-1 flex flex-col items-center justify-center bg-white rounded-xl py-md shadow-sm" bindtap="goPublish">
+      <text style="font-size: 44rpx;">📷</text>
+      <text class="text-xs mt-xs text-secondary">发布</text>
+    </view>
+    <view class="flex-1 flex flex-col items-center justify-center bg-white rounded-xl py-md shadow-sm" bindtap="goMyProducts">
+      <text style="font-size: 44rpx;">📦</text>
+      <text class="text-xs mt-xs text-secondary">我的商品</text>
+    </view>
+    <view class="flex-1 flex flex-col items-center justify-center bg-white rounded-xl py-md shadow-sm" bindtap="goFavorites">
+      <text style="font-size: 44rpx;">❤️</text>
+      <text class="text-xs mt-xs text-secondary">收藏</text>
+    </view>
+    <view class="flex-1 flex flex-col items-center justify-center bg-white rounded-xl py-md shadow-sm" bindtap="goOrders">
+      <text style="font-size: 44rpx;">📋</text>
+      <text class="text-xs mt-xs text-secondary">订单</text>
+    </view>
+  </view>
+
+  <!-- 热门商品 -->
+  <view class="px-md pt-md" wx:if="{{hotProducts.length > 0}}">
+    <view class="flex items-center justify-between mb-sm">
+      <text class="text-lg font-bold">🔥 热门商品</text>
+    </view>
+    <scroll-view scroll-x class="flex-row" style="white-space: nowrap; padding-bottom: 8rpx;">
+      <view
+        wx:for="{{hotProducts}}"
+        wx:key="id"
+        class="inline-block bg-white rounded-xl overflow-hidden shadow-sm mr-sm"
+        style="width: 280rpx;"
+        data-id="{{item.id}}"
+        bindtap="goDetail"
+      >
+        <image
+          src="{{helper.resolveUrl(item.images[0])}}"
+          mode="aspectFill"
+          style="width: 280rpx; height: 280rpx;"
+          lazy-load
+          wx:if="{{item.images && item.images.length > 0}}"
+        />
+        <view wx:else style="width: 280rpx; height: 280rpx; background: #f3f4f6; display: flex; align-items: center; justify-content: center;">
+          <text style="font-size: 64rpx;">📦</text>
+        </view>
+        <view class="p-sm">
+          <text class="text-sm font-semibold line-clamp-2">{{item.title}}</text>
+          <view class="flex items-center justify-between mt-xs">
+            <text class="text-md font-bold price-primary">¥{{helper.formatPrice(item.price)}}</text>
+            <text class="text-xs text-tertiary">{{helper.getConditionText(item.condition)}}</text>
+          </view>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 最新商品 -->
+  <view class="px-md pt-md" wx:if="{{latestProducts.length > 0}}">
+    <view class="flex items-center justify-between mb-sm">
+      <text class="text-lg font-bold">🆕 最新发布</text>
+    </view>
+    <view class="flex flex-wrap">
+      <view
+        wx:for="{{latestProducts}}"
+        wx:key="id"
+        class="bg-white rounded-xl overflow-hidden shadow-sm mb-sm"
+        style="width: calc(50% - 8rpx); {{helper.getGridStyle(index)}}"
+        data-id="{{item.id}}"
+        bindtap="goDetail"
+      >
+        <image
+          src="{{helper.resolveUrl(item.images[0])}}"
+          mode="aspectFill"
+          style="width: 100%; height: 320rpx;"
+          lazy-load
+          wx:if="{{item.images && item.images.length > 0}}"
+        />
+        <view wx:else style="width: 100%; height: 320rpx; background: #f3f4f6; display: flex; align-items: center; justify-content: center;">
+          <text style="font-size: 64rpx;">📦</text>
+        </view>
+        <view class="p-sm">
+          <text class="text-sm font-semibold line-clamp-2">{{item.title}}</text>
+          <view class="flex items-center justify-between mt-xs">
+            <text class="text-md font-bold price-primary">¥{{helper.formatPrice(item.price)}}</text>
+            <text class="text-xs text-tertiary">{{item.viewCount}}次浏览</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 加载中 -->
+  <view wx:if="{{loading}}" class="text-center py-lg">
+    <text class="text-secondary">加载中...</text>
+  </view>
+
+  <!-- 空状态 -->
+  <view wx:if="{{!loading && hotProducts.length === 0 && latestProducts.length === 0}}" class="text-center py-xl">
+    <text style="font-size: 80rpx;">📭</text>
+    <view class="mt-sm">
+      <text class="text-secondary">暂无商品，快去发布第一个吧！</text>
+    </view>
+    <button class="btn btn-primary mx-auto mt-md" style="width: 320rpx;" bindtap="goPublish">去发布</button>
+  </view>
+</view>

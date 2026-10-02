@@ -1,0 +1,65 @@
+{
+  "pages": [
+    "pages/products/products",
+    "pages/product-detail/product-detail",
+    "pages/product-create/product-create",
+    "pages/product-edit/product-edit",
+    "pages/home/home",
+    "pages/messages/messages",
+    "pages/chat/chat",
+    "pages/favorites/favorites",
+    "pages/orders/orders",
+    "pages/my-products/my-products",
+    "pages/profile/profile",
+    "pages/login/login",
+    "pages/register/register"
+  ],
+  "window": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "校园二手交易",
+    "navigationBarBackgroundColor": "#ffffff",
+    "backgroundColor": "#f5f5f7"
+  },
+  "tabBar": {
+    "color": "#9CA3AF",
+    "selectedColor": "#3A7BFF",
+    "borderStyle": "black",
+    "backgroundColor": "#FFFFFF",
+    "list": [
+      {
+        "pagePath": "pages/products/products",
+        "text": "商品",
+        "iconPath": "assets/icons/package.png",
+        "selectedIconPath": "assets/icons/package-active.png"
+      },
+      {
+        "pagePath": "pages/messages/messages",
+        "text": "消息",
+        "iconPath": "assets/icons/message.png",
+        "selectedIconPath": "assets/icons/message-active.png"
+      },
+      {
+        "pagePath": "pages/my-products/my-products",
+        "text": "我的商品",
+        "iconPath": "assets/icons/archive.png",
+        "selectedIconPath": "assets/icons/archive-active.png"
+      },
+      {
+        "pagePath": "pages/orders/orders",
+        "text": "订单",
+        "iconPath": "assets/icons/clipboard.png",
+        "selectedIconPath": "assets/icons/clipboard-active.png"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的",
+        "iconPath": "assets/icons/user.png",
+        "selectedIconPath": "assets/icons/user-active.png"
+      }
+    ]
+  },
+  "style": "v2",
+  "componentFramework": "glass-easel",
+  "lazyCodeLoading": "requiredComponents",
+  "sitemapLocation": "sitemap.json"
+}

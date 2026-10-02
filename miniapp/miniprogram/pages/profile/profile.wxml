@@ -1,0 +1,117 @@
+<!-- 个人中心 -->
+<wxs module="helper">
+function resolveUrl(path) {
+  if (!path) return ''
+  if (path.indexOf('http') === 0 || path.indexOf('blob:') === 0) return path
+  if (path.indexOf('/api/') === 0) return path
+  if (path.indexOf('/') === 0) return 'http://localhost:8080/api' + path
+  return path
+}
+module.exports = { resolveUrl: resolveUrl }
+</wxs>
+
+<view class="page-container">
+  <view wx:if="{{!isAuthenticated}}" class="text-center py-xl">
+    <text style="font-size: 80rpx;">👤</text>
+    <view class="mt-md"><text class="text-secondary">登录后查看个人中心</text></view>
+    <button class="btn btn-primary mx-auto mt-md" style="width: 320rpx;" bindtap="goLogin">去登录</button>
+  </view>
+
+  <view wx:else>
+    <!-- 头像区域 - 居中 -->
+    <view class="flex flex-col items-center py-xl bg-white" style="width: 100%;">
+      <view bindtap="chooseAvatar" style="display: flex; flex-direction: column; align-items: center;">
+        <image
+          wx:if="{{user.avatarUrl}}"
+          src="{{helper.resolveUrl(user.avatarUrl)}}"
+          class="rounded-full"
+          mode="aspectFill"
+          style="width: 160rpx; height: 160rpx;"
+        />
+        <view wx:else class="rounded-full bg-primary flex items-center justify-center" style="width: 160rpx; height: 160rpx;">
+          <text class="text-white" style="font-size: 64rpx;">{{user.name ? user.name[0] : (user.username ? user.username[0] : 'U')}}</text>
+        </view>
+        <text class="text-xs text-primary mt-sm text-center">更换头像</text>
+      </view>
+      <text class="text-xl font-bold mt-md">{{user.name || user.username}}</text>
+      <text class="text-sm text-secondary">{{user.school || '未设置学校'}} · {{user.college || ''}}</text>
+      <view class="flex items-center gap-sm mt-sm">
+        <text class="text-xs text-tertiary">信用分 {{user.creditScore || 5.0}}</text>
+      </view>
+    </view>
+
+    <!-- 快捷入口 -->
+    <view class="flex px-md gap-sm py-md">
+      <view class="flex-1 flex flex-col items-center bg-white rounded-lg py-md shadow-sm" bindtap="goOrders">
+        <text style="font-size: 40rpx;">📋</text>
+        <text class="text-xs mt-xs">我的订单</text>
+      </view>
+      <view class="flex-1 flex flex-col items-center bg-white rounded-lg py-md shadow-sm" bindtap="goMyProducts">
+        <text style="font-size: 40rpx;">📦</text>
+        <text class="text-xs mt-xs">我的商品</text>
+      </view>
+      <view class="flex-1 flex flex-col items-center bg-white rounded-lg py-md shadow-sm" bindtap="goFavorites">
+        <text style="font-size: 40rpx;">❤️</text>
+        <text class="text-xs mt-xs">我的收藏</text>
+      </view>
+    </view>
+
+    <!-- 个人信息 -->
+    <view class="card" style="margin: 0 24rpx 16rpx;">
+      <!-- 查看模式 -->
+      <view wx:if="{{!editMode}}">
+        <view class="flex items-center justify-between mb-sm">
+          <text class="text-lg font-bold">个人信息</text>
+          <text class="text-sm text-primary" bindtap="toggleEdit">编辑</text>
+        </view>
+        <view class="flex justify-between py-sm"><text class="text-secondary">用户名</text><text>{{user.username}}</text></view>
+        <view class="flex justify-between py-sm"><text class="text-secondary">姓名</text><text>{{user.name}}</text></view>
+        <view class="flex justify-between py-sm"><text class="text-secondary">学号</text><text>{{user.studentId}}</text></view>
+        <view class="flex justify-between py-sm"><text class="text-secondary">手机号</text><text>{{user.phone}}</text></view>
+        <view class="flex justify-between py-sm"><text class="text-secondary">邮箱</text><text>{{user.email}}</text></view>
+        <view class="flex justify-between py-sm"><text class="text-secondary">学校</text><text>{{user.school || '未设置'}}</text></view>
+        <view class="flex justify-between py-sm"><text class="text-secondary">学院</text><text>{{user.college || '未设置'}}</text></view>
+        <view class="flex justify-between py-sm"><text class="text-secondary">专业</text><text>{{user.major || '未设置'}}</text></view>
+        <view class="flex justify-between py-sm"><text class="text-secondary">年级</text><text>{{user.grade || '未设置'}}</text></view>
+      </view>
+      <!-- 编辑模式 -->
+      <view wx:else>
+        <text class="text-lg font-bold mb-md">编辑资料</text>
+        <view class="mb-sm"><text class="text-sm text-secondary">姓名</text><input class="input" value="{{formName}}" bindinput="onFormInput" data-field="formName"/></view>
+        <view class="mb-sm"><text class="text-sm text-secondary">手机号</text><input class="input" value="{{formPhone}}" bindinput="onFormInput" data-field="formPhone"/></view>
+        <view class="mb-sm"><text class="text-sm text-secondary">学校</text><input class="input" value="{{formSchool}}" bindinput="onFormInput" data-field="formSchool"/></view>
+        <view class="mb-sm"><text class="text-sm text-secondary">学院</text><input class="input" value="{{formCollege}}" bindinput="onFormInput" data-field="formCollege"/></view>
+        <view class="mb-sm"><text class="text-sm text-secondary">专业</text><input class="input" value="{{formMajor}}" bindinput="onFormInput" data-field="formMajor"/></view>
+        <view class="mb-md"><text class="text-sm text-secondary">年级</text><input class="input" value="{{formGrade}}" bindinput="onFormInput" data-field="formGrade"/></view>
+        <view class="flex gap-sm">
+          <button class="btn btn-outline flex-1" bindtap="toggleEdit">取消</button>
+          <button class="btn btn-primary flex-1" bindtap="saveProfile">保存</button>
+        </view>
+      </view>
+    </view>
+
+    <!-- 修改密码 -->
+    <view class="card" style="margin: 0 24rpx 16rpx;" wx:if="{{!showPasswordForm}}">
+      <view class="flex items-center justify-between" bindtap="togglePasswordForm">
+        <text class="text-lg font-bold">修改密码</text>
+        <text class="text-sm text-primary">修改</text>
+      </view>
+    </view>
+    <view class="card" style="margin: 0 24rpx 16rpx;" wx:if="{{showPasswordForm}}">
+      <text class="text-lg font-bold mb-md">修改密码</text>
+      <view class="mb-sm"><text class="text-sm text-secondary">原密码</text><input class="input" value="{{oldPassword}}" type="password" bindinput="onPwdInput" data-field="oldPassword"/></view>
+      <view class="mb-sm"><text class="text-sm text-secondary">新密码</text><input class="input" value="{{newPassword}}" type="password" bindinput="onPwdInput" data-field="newPassword"/></view>
+      <view class="mb-md"><text class="text-sm text-secondary">确认新密码</text><input class="input" value="{{confirmPassword}}" type="password" bindinput="onPwdInput" data-field="confirmPassword"/></view>
+      <view class="flex gap-sm">
+        <button class="btn btn-outline flex-1" bindtap="togglePasswordForm">取消</button>
+        <button class="btn btn-primary flex-1" bindtap="changePassword">确认修改</button>
+      </view>
+    </view>
+
+    <!-- 退出 -->
+    <view class="px-md pt-lg">
+      <button class="btn btn-danger w-full" bindtap="handleLogout">退出登录</button>
+    </view>
+    <view class="text-center py-md"><text class="text-xs text-tertiary">校园二手交易 v1.0</text></view>
+  </view>
+</view>

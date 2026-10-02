@@ -1,0 +1,156 @@
+<!-- 商品列表页（对齐 frontend-v2 mobile layout） -->
+<wxs module="helper">
+function resolveUrl(path) {
+  if (!path) return ''
+  if (path.indexOf('http') === 0 || path.indexOf('blob:') === 0) return path
+  if (path.indexOf('/api/') === 0) return path
+  if (path.indexOf('/') === 0) return 'http://localhost:8080/api' + path
+  return path
+}
+function formatPrice(price) {
+  if (price === undefined || price === null) return '0.00'
+  return (price * 1).toFixed(2)
+}
+function getConditionText(cond) {
+  if (cond === 10) return '全新'
+  if (cond === 9) return '99新'
+  if (cond === 8) return '95新'
+  if (cond === 7) return '9成新'
+  if (cond === 6) return '85新'
+  if (cond === 5) return '8成新'
+  if (cond === 4) return '7成新'
+  if (cond === 3) return '6成新'
+  if (cond === 2) return '5成新'
+  return '1成新'
+}
+// L1 分类三态：选中(蓝底白字)，展开(蓝边蓝字)，默认(灰边灰字)
+function getL1Style(selectedParentId, selectedCategoryId, catId) {
+  if (selectedCategoryId === catId) return 'background: #3A7BFF; color: #fff; border: 2rpx solid #3A7BFF;'
+  if (selectedParentId === catId) return 'background: #E8F0FF; color: #3A7BFF; border: 2rpx solid #3A7BFF;'
+  return 'background: #fff; color: #6B7280; border: 2rpx solid #E5E7EB;'
+}
+// L2 分类二态：选中(蓝底白字)，默认(灰边灰字)
+function getL2Style(selectedCategoryId, catId) {
+  if (selectedCategoryId === catId) return 'background: #3A7BFF; color: #fff; border: 2rpx solid #3A7BFF;'
+  return 'background: #fff; color: #6B7280; border: 2rpx solid #E5E7EB;'
+}
+function getGridStyle(index) {
+  if (index % 2 === 0) return 'margin-right: 8rpx;'
+  return 'margin-left: 8rpx;'
+}
+module.exports = { resolveUrl: resolveUrl, formatPrice: formatPrice, getConditionText: getConditionText, getL1Style: getL1Style, getL2Style: getL2Style, getGridStyle: getGridStyle }
+</wxs>
+
+<view class="page-container">
+  <!-- 搜索栏 -->
+  <view class="px-md py-sm bg-white">
+    <view class="flex items-center bg-bg rounded-full px-md" style="height: 72rpx;">
+      <text style="font-size: 26rpx; margin-right: 8rpx;">🔍</text>
+      <input
+        class="flex-1"
+        style="font-size: 26rpx;"
+        placeholder="搜索商品..."
+        value="{{keyword}}"
+        bindinput="onSearchInput"
+        bindconfirm="onSearch"
+        confirm-type="search"
+      />
+    </view>
+  </view>
+
+  <!-- L1 分类筛选 -->
+  <scroll-view scroll-x class="bg-white px-md pb-sm" wx:if="{{parentCategories.length > 0}}" style="white-space: nowrap;">
+    <view class="inline-block px-sm py-xs rounded-full mr-xs text-sm" style="{{selectedCategoryId === 0 ? 'background:#3A7BFF;color:#fff;border:2rpx solid #3A7BFF;' : 'background:#fff;color:#6B7280;border:2rpx solid #E5E7EB;'}}" data-id="0" data-level="0" bindtap="onCategoryTap">全部</view>
+    <view
+      wx:for="{{parentCategories}}"
+      wx:key="id"
+      wx:for-item="cat"
+      class="inline-block px-sm py-xs rounded-full mr-xs text-sm"
+      style="{{helper.getL1Style(selectedParentId, selectedCategoryId, cat.id)}}"
+      data-id="{{cat.id}}"
+      data-level="0"
+      data-name="{{cat.name}}"
+      bindtap="onCategoryTap"
+    >
+      {{cat.name}}
+    </view>
+  </scroll-view>
+  <!-- L2 分类筛选（选中 L1 后显示） -->
+  <scroll-view scroll-x class="bg-white px-md pb-sm" wx:if="{{childCategories.length > 0}}" style="white-space: nowrap;border-left:4rpx solid #3A7BFF;padding-left:12rpx;">
+    <text class="inline-block text-xs mr-xs" style="color:#9CA3AF;line-height:2;">二级分类：</text>
+    <view
+      wx:for="{{childCategories}}"
+      wx:key="id"
+      wx:for-item="cat"
+      class="inline-block px-sm py-xs rounded-full mr-xs text-sm"
+      style="{{helper.getL2Style(selectedCategoryId, cat.id)}}"
+      data-id="{{cat.id}}"
+      data-level="1"
+      data-name="{{cat.name}}"
+      bindtap="onCategoryTap"
+    >
+      {{cat.name}}
+    </view>
+  </scroll-view>
+
+  <!-- 商品网格 -->
+  <view class="flex flex-wrap px-md pt-sm">
+    <view
+      wx:for="{{products}}"
+      wx:key="id"
+      class="bg-white rounded-xl overflow-hidden shadow-sm mb-sm"
+      style="width: calc(50% - 8rpx); {{helper.getGridStyle(index)}}"
+      data-id="{{item.id}}"
+      bindtap="goDetail"
+    >
+      <view style="position:relative;">
+        <image
+          src="{{helper.resolveUrl(item.images[0])}}"
+          mode="aspectFill"
+          style="width: 100%; height: 320rpx;"
+          lazy-load
+          wx:if="{{item.images && item.images.length > 0}}"
+        />
+        <view wx:else style="width: 100%; height: 320rpx; background: #f3f4f6; display: flex; align-items: center; justify-content: center;">
+          <text style="font-size: 64rpx;">📦</text>
+        </view>
+        <!-- 收藏按钮（右上角心形，对齐 frontend-v2 ProductCard） -->
+        <view
+          catchtap="toggleFavorite"
+          data-id="{{item.id}}"
+          style="position:absolute;top:12rpx;right:12rpx;width:56rpx;height:56rpx;border-radius:50%;display:flex;align-items:center;justify-content:center;background:{{favoriteIds[item.id] ? '#EF4444' : 'rgba(255,255,255,0.9)'}};box-shadow:0 2rpx 8rpx rgba(0,0,0,0.15);"
+        >
+          <text style="font-size:28rpx;line-height:1;">{{favoriteIds[item.id] ? '❤️' : '🤍'}}</text>
+        </view>
+      </view>
+      <view class="p-sm">
+        <text class="text-sm font-semibold line-clamp-2">{{item.title}}</text>
+        <view class="flex items-center justify-between mt-xs">
+          <text class="text-md font-bold price-primary">¥{{helper.formatPrice(item.price)}}</text>
+          <text class="text-xs text-tertiary">{{helper.getConditionText(item.condition)}}</text>
+        </view>
+        <view class="flex items-center justify-between mt-xs">
+          <text class="text-xs text-tertiary">{{item.sellerName || '匿名'}}</text>
+          <text class="text-xs text-tertiary">{{item.viewCount}}次浏览</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 加载更多 -->
+  <view wx:if="{{loading}}" class="text-center py-md">
+    <text class="text-sm text-secondary">加载中...</text>
+  </view>
+  <view wx:elif="{{hasMore}}" class="text-center py-md" bindtap="onLoadMore">
+    <text class="text-sm text-primary">加载更多</text>
+  </view>
+  <view wx:elif="{{products.length > 0}}" class="text-center py-md">
+    <text class="text-sm text-tertiary">— 已经到底了 —</text>
+  </view>
+
+  <!-- 空状态 -->
+  <view wx:if="{{!loading && products.length === 0}}" class="text-center py-xl">
+    <text style="font-size: 80rpx;">📭</text>
+    <view class="mt-sm"><text class="text-secondary">暂无商品</text></view>
+  </view>
+</view>

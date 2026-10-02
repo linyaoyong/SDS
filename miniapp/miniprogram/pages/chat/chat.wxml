@@ -1,0 +1,101 @@
+<!-- 聊天窗口 -->
+<wxs module="helper">
+function resolveUrl(path) {
+  if (!path) return ''
+  if (path.indexOf('http') === 0) return path
+  if (path.indexOf('/api/') === 0) return path
+  if (path.indexOf('/') === 0) return 'http://localhost:8080/api' + path
+  return path
+}
+function pad2(n) {
+  return n < 10 ? '0' + n : '' + n
+}
+function formatTime(d) {
+  if (!d) return ''
+  var date = getDate(d)
+  return pad2(date.getHours()) + ':' + pad2(date.getMinutes())
+}
+module.exports.resolveUrl = resolveUrl;
+module.exports.formatTime = formatTime;
+module.exports.pad2 = pad2;
+</wxs>
+
+<!-- 整页容器：固定占满屏幕，禁止页面自身滚动 -->
+<view class="chat-root">
+
+  <!-- 顶部商品卡片（固定在顶部，不随消息滚动；对齐 frontend-v2 聊天窗口设计） -->
+  <view wx:if="{{product}}" class="chat-header flex items-center px-md py-sm bg-white" bindtap="goProduct">
+    <image
+      wx:if="{{product.images && product.images.length > 0}}"
+      src="{{helper.resolveUrl(product.images[0])}}"
+      mode="aspectFill"
+      class="rounded-md"
+      style="width: 80rpx; height: 80rpx; flex-shrink: 0;"
+    />
+    <view wx:else class="rounded-md bg-bg flex items-center justify-center" style="width: 80rpx; height: 80rpx; flex-shrink: 0;">
+      <text>📦</text>
+    </view>
+    <view class="flex-1 ml-sm flex items-center justify-between">
+      <view style="flex: 1; min-width: 0;">
+        <text class="text-md font-semibold line-clamp-1">{{product.title}}</text>
+        <text class="text-sm text-danger font-bold">¥{{product.price}}</text>
+      </view>
+      <text class="text-xs text-primary ml-sm" style="white-space: nowrap;">查看商品 ›</text>
+    </view>
+  </view>
+
+  <!-- 消息列表（仅此区域滚动） -->
+  <scroll-view
+    scroll-y
+    class="chat-body"
+    scroll-top="{{scrollTop}}"
+    scroll-with-animation="{{false}}"
+    style="padding-top: {{product ? '0' : '0'}};"
+  >
+    <view wx:if="{{loading}}" class="text-center py-xl">
+      <text class="text-secondary">加载中...</text>
+    </view>
+    <view wx:elif="{{messages.length === 0}}" class="text-center py-xl">
+      <text class="text-secondary">暂无消息，发送第一条消息吧</text>
+    </view>
+    <block wx:for="{{messages}}" wx:key="id" wx:for-index="idx">
+      <view id="msg-{{idx}}" class="flex mb-sm {{item.senderId === currentUserId ? 'justify-end' : 'justify-start'}}">
+        <view wx:if="{{item.messageType === 'SYSTEM'}}" class="flex justify-center px-lg" style="width: 100%;">
+          <view class="rounded-full" style="max-width: 80%; background: #FEF3C7; padding: 8rpx 24rpx;">
+            <text class="text-xs" style="color: #92400E;">🔔 系统消息：{{item.content}}</text>
+          </view>
+        </view>
+        <view wx:else class="rounded-lg px-md py-sm {{item.senderId === currentUserId ? 'bg-primary text-white' : 'bg-white'}}" style="max-width: 75%;{{item.senderId === currentUserId ? '' : 'border: 1rpx solid var(--color-border);'}}">
+          <text style="word-break: break-all;">{{item.content}}</text>
+          <view class="flex items-center justify-end gap-sm" style="margin-top: 8rpx;{{item.senderId === currentUserId ? 'color: rgba(255,255,255,0.7);' : 'color: var(--color-text-tertiary);'}}">
+            <text class="text-xs">{{helper.formatTime(item.createdAt)}}</text>
+            <text wx:if="{{item.senderId === currentUserId}}" class="text-xs">{{item.isRead ? '✓✓' : '✓'}}</text>
+          </view>
+        </view>
+      </view>
+    </block>
+    <!-- 底部占位，确保最后一条消息不会被输入栏遮挡 -->
+    <view style="height: 16rpx;"></view>
+  </scroll-view>
+
+  <!-- 底部输入栏（固定在底部） -->
+  <view class="chat-footer flex items-center px-md py-sm bg-white">
+    <input
+      class="flex-1 input"
+      style="height: 72rpx; background: var(--color-bg); border-radius: 36rpx;"
+      placeholder="输入消息..."
+      value="{{inputText}}"
+      bindinput="onInput"
+      bindconfirm="sendMessage"
+      confirm-type="send"
+      adjust-position="{{true}}"
+    />
+    <button
+      class="btn {{canSend ? 'btn-primary' : 'btn-disabled'}} ml-sm"
+      style="height: 72rpx; padding: 0 24rpx; font-size: 26rpx; border-radius: 36rpx;"
+      bindtap="sendMessage"
+      disabled="{{!canSend}}"
+      loading="{{sending}}"
+    >发送</button>
+  </view>
+</view>

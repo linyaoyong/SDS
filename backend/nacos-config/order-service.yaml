@@ -1,0 +1,8 @@
+# campus-trade-demo-managed: true
+resilience:
+  circuit-breaker:
+    slow-call-rt-ms: 1000
+    slow-ratio-threshold: 0.5
+    min-request-amount: 5
+    stat-interval-ms: 60000
+    time-window-seconds: 10

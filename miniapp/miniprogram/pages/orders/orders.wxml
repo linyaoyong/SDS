@@ -1,0 +1,65 @@
+<!-- 订单管理 -->
+<view class="page-container" wx:if="{{!isAuthenticated}}">
+  <view class="text-center py-xl">
+    <text style="font-size: 80rpx;">📋</text>
+    <view class="mt-md"><text class="text-secondary">请先登录查看订单</text></view>
+    <button class="btn btn-primary mx-auto mt-md" style="width: 320rpx;" bindtap="goLogin">去登录</button>
+  </view>
+</view>
+
+<view class="page-container" wx:else>
+  <!-- 买家/卖家 Tab -->
+  <view class="flex bg-white">
+    <view class="flex-1 text-center py-sm" style="{{activeTab === 'buyer' ? 'color: var(--color-primary); font-weight: 700; border-bottom: 4rpx solid var(--color-primary);' : 'color: var(--color-text-secondary);'}}" data-tab="buyer" bindtap="switchTab">我买的</view>
+    <view class="flex-1 text-center py-sm" style="{{activeTab === 'seller' ? 'color: var(--color-primary); font-weight: 700; border-bottom: 4rpx solid var(--color-primary);' : 'color: var(--color-text-secondary);'}}" data-tab="seller" bindtap="switchTab">我卖的</view>
+  </view>
+
+  <!-- 状态筛选 -->
+  <scroll-view scroll-x class="bg-white px-md pt-sm pb-sm" style="white-space: nowrap; border-top: 1rpx solid var(--color-border);" enable-flex>
+    <view wx:for="{{statusTabs}}" wx:key="status" wx:for-item="s" class="inline-block px-sm py-xs rounded-full mr-xs text-sm" style="{{statusFilter === s.status ? 'background: var(--color-primary); color: #fff;' : 'background: var(--color-bg); color: var(--color-text-secondary);'}}" data-status="{{s.status}}" bindtap="filterStatus">{{s.label}}</view>
+  </scroll-view>
+
+  <!-- 订单列表 -->
+  <view wx:if="{{loading}}" class="text-center py-xl"><text class="text-secondary">加载中...</text></view>
+  <view wx:elif="{{orders.length === 0}}" class="text-center py-xl">
+    <text style="font-size: 80rpx;">📭</text>
+    <view class="mt-sm"><text class="text-secondary">暂无订单</text></view>
+  </view>
+  <block wx:else>
+    <view wx:for="{{orders}}" wx:key="id" class="card">
+    <view class="flex justify-between mb-sm">
+      <text class="text-xs text-secondary">{{item.orderNo}}</text>
+      <text class="text-sm font-bold">{{item.status === 0 ? '待付款' : item.status === 1 ? '已付款' : item.status === 2 ? '已发货' : item.status === 3 ? '已完成' : item.status === 4 ? '已取消' : '处理中'}}</text>
+    </view>
+    <text class="text-md font-semibold">{{item.productTitle}}</text>
+    <view class="flex justify-between items-center mt-sm">
+      <text class="text-lg font-bold price-primary">¥{{item.totalAmount}}</text>
+      <text class="text-sm text-secondary">×{{item.quantity}}</text>
+    </view>
+    <view class="flex justify-between items-center mt-sm pt-sm" style="border-top: 1rpx solid var(--color-border);">
+      <text class="text-xs text-secondary">{{activeTab === 'buyer' ? '卖家: ' + item.sellerName : '买家: ' + item.buyerName}}</text>
+      <text class="text-xs text-tertiary">{{item.createdAt}}</text>
+    </view>
+    <view class="flex justify-end gap-sm mt-sm">
+      <button wx:if="{{item.status === 0 && activeTab === 'buyer'}}" class="btn btn-primary" style="height: 56rpx; font-size: 24rpx; padding: 0 16rpx;" data-action="pay" data-id="{{item.id}}" catchtap="doAction">支付</button>
+      <button wx:if="{{item.status === 1 && activeTab === 'seller'}}" class="btn btn-primary" style="height: 56rpx; font-size: 24rpx; padding: 0 16rpx;" data-action="deliver" data-id="{{item.id}}" catchtap="doAction">发货</button>
+      <button wx:if="{{item.status === 2 && activeTab === 'buyer'}}" class="btn btn-primary" style="height: 56rpx; font-size: 24rpx; padding: 0 16rpx;" data-action="confirm" data-id="{{item.id}}" catchtap="doAction">确认收货</button>
+      <button wx:if="{{item.status === 3 && activeTab === 'buyer'}}" class="btn btn-outline" style="height: 56rpx; font-size: 24rpx; padding: 0 16rpx;" data-id="{{item.id}}" catchtap="openReview">评价</button>
+      <button wx:if="{{item.status === 0 && activeTab === 'buyer'}}" class="btn btn-outline" style="height: 56rpx; font-size: 24rpx; padding: 0 16rpx; color: var(--color-danger);" data-action="cancel" data-id="{{item.id}}" catchtap="doAction">取消</button>
+    </view>
+      </view>
+  </block>
+  <view wx:if="{{errorMsg}}" class="text-center py-md"><text class="text-sm text-danger">{{errorMsg}}</text></view>
+</view>
+
+<!-- 评价弹窗 -->
+<view wx:if="{{showReview}}" id="review-mask" class="fixed" style="top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:1000;display:flex;align-items:flex-end;" bindtap="onReviewMaskTap">
+  <view id="review-content" class="bg-white w-full rounded-xl" style="padding:32rpx;padding-bottom:calc(32rpx + env(safe-area-inset-bottom));" catchtap="preventReviewClose">
+    <view class="flex justify-between mb-md"><text class="text-lg font-bold">评价</text><text class="text-sm text-secondary" catchtap="closeReview">取消</text></view>
+    <view class="flex justify-center gap-sm mb-md">
+      <text wx:for="{{[1,2,3,4,5]}}" wx:key="*this" style="font-size:48rpx;" data-rating="{{item}}" catchtap="setRating">{{item <= reviewRating ? '⭐' : '☆'}}</text>
+    </view>
+    <textarea class="textarea mb-md" placeholder="写下你的评价..." value="{{reviewContent}}" bindinput="onReviewInput" maxlength="200"/>
+    <button class="btn btn-primary w-full" loading="{{reviewSubmitting || reviewHistoryLoading}}" disabled="{{reviewSubmitting || reviewHistoryLoading}}" catchtap="submitReview">提交评价</button>
+  </view>
+</view>

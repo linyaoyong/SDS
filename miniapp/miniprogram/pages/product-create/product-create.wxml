@@ -1,0 +1,126 @@
+<!-- 发布商品 -->
+<view class="page-container" wx:if="{{isAuthenticated}}">
+  <view class="card">
+    <text class="text-lg font-bold">发布商品</text>
+
+    <!-- 图片上传 -->
+    <view class="mt-md">
+      <view class="text-sm text-secondary mb-sm">商品图片 (最多9张)</view>
+      <view class="flex flex-wrap gap-sm">
+        <view
+          wx:for="{{images}}"
+          wx:key="*this"
+          class="relative rounded-md overflow-hidden"
+          style="width: 160rpx; height: 160rpx;"
+        >
+          <image src="{{item}}" mode="aspectFill" style="width: 100%; height: 100%;" />
+          <view
+            class="absolute flex items-center justify-center bg-danger"
+            style="top: 0; right: 0; width: 40rpx; height: 40rpx; border-radius: 0 0 0 8rpx;"
+            data-index="{{index}}"
+            bindtap="removeImage"
+          >
+            <text class="text-white text-xs">✕</text>
+          </view>
+        </view>
+        <view
+          wx:if="{{images.length < 9}}"
+          class="flex flex-col items-center justify-center rounded-md"
+          style="width: 160rpx; height: 160rpx; border: 2rpx dashed var(--color-border);"
+          bindtap="chooseImages"
+        >
+          <text style="font-size: 48rpx;">+</text>
+          <text class="text-xs text-tertiary">{{images.length}}/9</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 标题 -->
+    <view class="mt-md">
+      <view class="text-sm text-secondary mb-xs">商品标题 *</view>
+      <input class="input" placeholder="请输入商品标题" value="{{title}}" bindinput="onInput" data-field="title" maxlength="50"/>
+    </view>
+
+    <!-- 分类（两级选择，对齐 frontend-v2） -->
+    <view class="mt-md">
+      <view class="text-sm text-secondary mb-xs">分类 *</view>
+      <view class="input flex items-center justify-between" bindtap="toggleCategoryPicker">
+        <text class="{{selectedCategoryId ? '' : 'text-tertiary'}}">{{selectedCategoryName}}</text>
+        <text class="text-tertiary">▼</text>
+      </view>
+      <view wx:if="{{showCategoryPicker}}" class="mt-sm bg-bg rounded-md p-sm">
+        <!-- 一级分类 -->
+        <view class="text-xs text-tertiary mb-xs">一级分类</view>
+        <view class="flex flex-wrap gap-xs">
+          <view wx:for="{{categories}}" wx:key="id" wx:for-item="cat"
+            class="tag {{selectedL1Id === cat.id ? 'tag-blue' : 'tag-gray'}}"
+            data-id="{{cat.id}}" data-name="{{cat.name}}"
+            bindtap="selectL1"
+          >
+            {{cat.name}}
+          </view>
+        </view>
+        <!-- 二级分类（仅当一级有子分类时展示） -->
+        <block wx:if="{{selectedL1Id && l2Categories.length > 0}}">
+          <view class="text-xs text-tertiary mt-sm mb-xs">二级分类</view>
+          <view class="flex flex-wrap gap-xs">
+            <view wx:for="{{l2Categories}}" wx:key="id" wx:for-item="sub"
+              class="tag {{selectedCategoryId === sub.id ? 'tag-blue' : 'tag-gray'}}"
+              data-id="{{sub.id}}" data-name="{{sub.name}}"
+              bindtap="selectL2"
+            >
+              {{sub.name}}
+            </view>
+          </view>
+        </block>
+      </view>
+    </view>
+
+    <!-- 价格 -->
+    <view class="mt-md flex gap-sm">
+      <view class="flex-1">
+        <view class="text-sm text-secondary mb-xs">价格 ¥ *</view>
+        <input class="input" placeholder="0.00" value="{{price}}" type="digit" bindinput="onInput" data-field="price"/>
+      </view>
+      <view class="flex-1">
+        <view class="text-sm text-secondary mb-xs">原价 ¥</view>
+        <input class="input" placeholder="0.00" value="{{originalPrice}}" type="digit" bindinput="onInput" data-field="originalPrice"/>
+      </view>
+    </view>
+
+    <!-- 库存 -->
+    <view class="mt-md">
+      <view class="text-sm text-secondary mb-xs">库存数量</view>
+      <input class="input" placeholder="1" value="{{stockQuantity}}" type="number" bindinput="onInput" data-field="stockQuantity"/>
+    </view>
+
+    <!-- 成色 -->
+    <view class="mt-md">
+      <view class="text-sm text-secondary mb-xs">成色</view>
+      <picker range="{{['全新','99新','95新','9成新','85新','8成新','7成新','6成新','5成新','1成新']}}" value="{{10 - condition}}" bindchange="onConditionChange">
+        <view class="input flex items-center justify-between">
+          <text>{{conditionText}}</text>
+          <text class="text-tertiary">▾</text>
+        </view>
+      </picker>
+    </view>
+
+    <!-- 标签 -->
+    <view class="mt-md">
+      <view class="text-sm text-secondary mb-xs">标签</view>
+      <view class="flex flex-wrap gap-xs mb-xs"><view wx:for="{{tags}}" wx:key="*this" class="tag tag-blue" style="padding-right:4rpx;"><text>{{item}}</text><text style="margin-left:6rpx;font-size:20rpx;" data-index="{{index}}" catchtap="removeTag">✕</text></view></view>
+      <view class="flex items-center gap-sm"><input class="input flex-1" style="height:64rpx;" placeholder="输入标签" value="{{tagInput}}" bindinput="onTagInput" bindconfirm="addTag" confirm-type="done" maxlength="15"/><view class="btn btn-primary" style="width:64rpx;height:64rpx;padding:0;border-radius:12rpx;flex-shrink:0;" bindtap="addTag"><text style="font-size:36rpx;">+</text></view></view>
+    </view>
+
+    <!-- 描述 -->
+    <view class="mt-md">
+      <view class="text-sm text-secondary mb-xs">商品描述</view>
+      <textarea class="textarea" placeholder="描述你的商品..." value="{{description}}" bindinput="onInput" data-field="description" maxlength="1000"/>
+    </view>
+
+    <!-- 提交按钮 -->
+    <button class="btn btn-primary w-full mt-lg {{submitting ? 'btn-disabled' : ''}}" bindtap="handleSubmit" disabled="{{submitting}}" loading="{{submitting}}">
+      发布
+    </button>
+  </view>
+</view>

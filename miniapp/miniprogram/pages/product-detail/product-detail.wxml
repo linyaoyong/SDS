@@ -1,0 +1,109 @@
+<!-- 商品详情 -->
+<view wx:if="{{loading}}" class="text-center py-xl">
+  <text class="text-secondary">加载中...</text>
+</view>
+
+<view wx:elif="{{!product}}" class="text-center py-xl">
+  <text style="font-size:80rpx;">😕</text>
+  <view class="mt-sm"><text class="text-secondary">商品未找到</text></view>
+</view>
+
+<scroll-view wx:else scroll-y class="page-container" style="height:100vh;padding-bottom:240rpx;">
+  <!-- 图片轮播 -->
+  <swiper wx:if="{{images.length > 0}}" style="width:100%;height:750rpx;" indicator-dots="{{images.length > 1}}" indicator-color="#ffffff80" indicator-active-color="#3A7BFF" autoplay circular>
+    <swiper-item wx:for="{{images}}" wx:key="*this">
+      <image src="{{item}}" mode="aspectFill" style="width:100%;height:100%;" data-url="{{item}}" bindtap="onPreviewImage"/>
+    </swiper-item>
+  </swiper>
+  <view wx:else style="width:100%;height:750rpx;background:#f3f4f6;display:flex;align-items:center;justify-content:center;">
+    <text style="font-size:80rpx;">📦</text>
+  </view>
+
+  <!-- 价格 + 标题 -->
+  <view class="bg-white px-md py-md">
+    <view class="flex items-end justify-between mb-sm">
+      <view class="flex items-baseline">
+        <text class="text-2xl font-bold price-primary">¥{{product.price}}</text>
+        <text wx:if="{{product.originalPrice}}" class="text-sm price-through ml-sm">¥{{product.originalPrice}}</text>
+      </view>
+      <text class="text-sm text-secondary">库存 {{product.stockQuantity || 0}}</text>
+    </view>
+    <text class="text-lg font-semibold">{{product.title}}</text>
+    <view class="flex gap-sm mt-sm">
+      <text wx:if="{{product.condition >= 9}}" class="tag tag-green">全新</text>
+      <text wx:elif="{{product.condition >= 7}}" class="tag tag-blue">{{product.condition}}成新</text>
+      <text wx:elif="{{product.condition >= 4}}" class="tag tag-orange">{{product.condition}}成新</text>
+      <text wx:else class="tag tag-red">{{product.condition}}成新</text>
+      <text class="tag tag-green" wx:if="{{product.status === 1}}">在售</text>
+      <text class="tag tag-gray" wx:else>已售/下架</text>
+    </view>
+  </view>
+
+  <!-- 统计 -->
+  <view class="bg-white px-md py-md mt-sm">
+    <view class="flex text-center">
+      <view class="flex-1"><text class="text-lg font-bold">{{product.viewCount || 0}}</text><view><text class="text-xs text-secondary">浏览</text></view></view>
+      <view class="flex-1"><text class="text-lg font-bold">{{product.favoriteCount || 0}}</text><view><text class="text-xs text-secondary">收藏</text></view></view>
+      <view class="flex-1"><text class="text-lg font-bold">{{product.stockQuantity || 0}}</text><view><text class="text-xs text-secondary">库存</text></view></view>
+    </view>
+  </view>
+
+  <!-- 卖家信息 -->
+  <view class="bg-white px-md py-md mt-sm">
+    <view class="flex items-center">
+      <image wx:if="{{sellerAvatar}}" src="{{sellerAvatar}}" style="width:80rpx;height:80rpx;border-radius:50%;"/>
+      <view wx:else style="width:80rpx;height:80rpx;border-radius:50%;background:var(--color-primary);display:flex;align-items:center;justify-content:center;">
+        <text class="text-white font-bold">{{product.sellerName ? product.sellerName[0] : 'U'}}</text>
+      </view>
+      <view style="flex:1;margin-left:16rpx;">
+        <text class="text-md font-semibold">{{product.sellerName || '用户'}}</text>
+        <view><text class="text-xs text-secondary">{{product.location || '校园'}}</text></view>
+      </view>
+      <button wx:if="{{!isOwner}}" class="btn btn-outline" style="height:60rpx;font-size:24rpx;padding:0 20rpx;" bindtap="handleContactSeller">联系卖家</button>
+      <button wx:else class="btn btn-outline" style="height:60rpx;font-size:24rpx;padding:0 20rpx;" bindtap="goEdit">编辑</button>
+    </view>
+  </view>
+
+  <!-- 描述 -->
+  <view wx:if="{{product.description}}" class="bg-white px-md py-md mt-sm">
+    <text class="text-sm font-bold text-secondary">商品描述</text>
+    <view class="mt-sm"><text>{{product.description}}</text></view>
+  </view>
+
+  
+
+  <!-- 评价 -->
+  <view class="bg-white px-md py-md mt-sm mb-lg">
+    <text class="text-sm font-bold text-secondary">商品评价</text>
+    <view wx:if="{{reviews.length === 0}}" class="text-center py-md">
+      <text class="text-sm text-tertiary">暂无评价</text>
+    </view>
+    <view wx:for="{{reviews}}" wx:key="id" wx:for-item="rv" class="py-sm">
+      <view wx:if="{{index > 0}}" class="divider mb-sm"></view>
+      <view class="flex justify-between">
+        <text class="text-sm font-semibold">{{rv.reviewerName}}</text>
+        <text class="text-xs text-tertiary">{{rv.createdAt}}</text>
+      </view>
+      <view class="mt-xs">
+        <text wx:for="{{[1,2,3,4,5]}}" wx:key="*this" wx:for-item="s" wx:if="{{s <= rv.rating}}">⭐</text>
+      </view>
+      <text class="text-sm text-secondary mt-xs">{{rv.content}}</text>
+    </view>
+  </view>
+</scroll-view>
+
+<!-- 底部购买栏 -->
+<view wx:if="{{product && !isOwner}}" class="fixed flex items-center px-md bg-white" style="bottom:0;left:0;right:0;height:100rpx;border-top:1rpx solid var(--color-border);padding-bottom:env(safe-area-inset-bottom);z-index:100;">
+  <view class="flex items-center justify-center" style="width:40%;">
+    <view class="flex items-center" style="border:1rpx solid var(--color-border);border-radius:32rpx;overflow:hidden;">
+      <view style="width:56rpx;height:56rpx;display:flex;align-items:center;justify-content:center;" bindtap="decreaseQty"><text>-</text></view>
+      <text class="text-lg font-bold px-md">{{quantity}}</text>
+      <view style="width:56rpx;height:56rpx;display:flex;align-items:center;justify-content:center;" bindtap="increaseQty"><text>+</text></view>
+    </view>
+  </view>
+  <view catchtap="toggleFavorite" style="width:88rpx;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+    <text style="font-size:40rpx;line-height:1;">{{isFavorited ? '❤️' : '🤍'}}</text>
+    <text class="text-xs" style="color:{{isFavorited ? '#EF4444' : '#9CA3AF'}};margin-top:4rpx;">{{isFavorited ? '已收藏' : '收藏'}}</text>
+  </view>
+  <button class="btn btn-primary" style="flex:1;height:72rpx;border-radius:36rpx;font-size:28rpx;" bindtap="handleBuy">立即购买</button>
+</view>

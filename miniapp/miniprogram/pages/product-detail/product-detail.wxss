@@ -1,0 +1,8 @@
+.detail-swiper {
+  width: 100%;
+  height: 750rpx;
+}
+
+.divider-top {
+  border-top: 1rpx solid var(--color-border);
+}

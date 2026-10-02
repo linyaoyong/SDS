@@ -1,0 +1,263 @@
+/* ========================================
+   全局样式变量 & 原子工具类
+   参照 frontend-v2 Tailwind 设计
+   ======================================== */
+
+/* ---- CSS 变量 ---- */
+page {
+  --color-primary: #3A7BFF;
+  --color-primary-light: #E8F0FF;
+  --color-danger: #FF4757;
+  --color-danger-light: #FFE0E3;
+  --color-success: #2ED573;
+  --color-success-light: #E0FFE8;
+  --color-warning: #FFA502;
+  --color-warning-light: #FFF3E0;
+  --color-text-primary: #1A1A2E;
+  --color-text-secondary: #6B7280;
+  --color-text-tertiary: #9CA3AF;
+  --color-bg: #F5F5F7;
+  --color-bg-card: #FFFFFF;
+  --color-border: #E5E7EB;
+  --radius-sm: 6rpx;
+  --radius-md: 12rpx;
+  --radius-lg: 16rpx;
+  --radius-xl: 24rpx;
+  --radius-full: 9999rpx;
+  --font-xs: 20rpx;
+  --font-sm: 24rpx;
+  --font-md: 28rpx;
+  --font-lg: 32rpx;
+  --font-xl: 36rpx;
+  --font-2xl: 44rpx;
+  --spacing-xs: 8rpx;
+  --spacing-sm: 16rpx;
+  --spacing-md: 24rpx;
+  --spacing-lg: 32rpx;
+  --spacing-xl: 48rpx;
+  --shadow-sm: 0 2rpx 8rpx rgba(0,0,0,0.06);
+  --shadow-md: 0 4rpx 16rpx rgba(0,0,0,0.08);
+  --shadow-lg: 0 8rpx 32rpx rgba(0,0,0,0.12);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: var(--font-md);
+  color: var(--color-text-primary);
+  background-color: var(--color-bg);
+  line-height: 1.5;
+}
+
+/* ---- 原子工具类 ---- */
+.flex { display: flex; }
+.inline-block { display: inline-block; }
+.flex-col { flex-direction: column; }
+.flex-row { flex-direction: row; }
+.flex-wrap { flex-wrap: wrap; }
+.flex-1 { flex: 1; }
+.items-center { align-items: center; }
+.items-start { align-items: flex-start; }
+.items-end { align-items: flex-end; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.justify-start { justify-content: flex-start; }
+.justify-end { justify-content: flex-end; }
+
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.line-clamp-1 { overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; }
+.line-clamp-2 { overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.overflow-hidden { overflow: hidden; }
+
+.relative { position: relative; }
+.absolute { position: absolute; }
+.fixed { position: fixed; }
+
+/* ---- 间距 ---- */
+.p-xs { padding: var(--spacing-xs); }
+.p-sm { padding: var(--spacing-sm); }
+.p-md { padding: var(--spacing-md); }
+.p-lg { padding: var(--spacing-lg); }
+.px-xs { padding-left: var(--spacing-xs); padding-right: var(--spacing-xs); }
+.px-sm { padding-left: var(--spacing-sm); padding-right: var(--spacing-sm); }
+.px-md { padding-left: var(--spacing-md); padding-right: var(--spacing-md); }
+.px-lg { padding-left: var(--spacing-lg); padding-right: var(--spacing-lg); }
+.py-xs { padding-top: var(--spacing-xs); padding-bottom: var(--spacing-xs); }
+.py-sm { padding-top: var(--spacing-sm); padding-bottom: var(--spacing-sm); }
+.py-md { padding-top: var(--spacing-md); padding-bottom: var(--spacing-md); }
+.py-lg { padding-top: var(--spacing-lg); padding-bottom: var(--spacing-lg); }
+.pt-sm { padding-top: var(--spacing-sm); }
+.pt-md { padding-top: var(--spacing-md); }
+.pt-lg { padding-top: var(--spacing-lg); }
+.pb-sm { padding-bottom: var(--spacing-sm); }
+.pb-md { padding-bottom: var(--spacing-md); }
+.pb-lg { padding-bottom: var(--spacing-lg); }
+
+.mt-sm { margin-top: var(--spacing-sm); }
+.mt-md { margin-top: var(--spacing-md); }
+.mt-lg { margin-top: var(--spacing-lg); }
+.mb-sm { margin-bottom: var(--spacing-sm); }
+.mb-md { margin-bottom: var(--spacing-md); }
+.mb-lg { margin-bottom: var(--spacing-lg); }
+.ml-sm { margin-left: var(--spacing-sm); }
+.ml-md { margin-left: var(--spacing-md); }
+.mr-sm { margin-right: var(--spacing-sm); }
+.mr-md { margin-right: var(--spacing-md); }
+.mx-auto { margin-left: auto; margin-right: auto; }
+
+.gap-xs { gap: var(--spacing-xs); }
+.gap-sm { gap: var(--spacing-sm); }
+.gap-md { gap: var(--spacing-md); }
+
+/* ---- 圆角 ---- */
+.rounded-sm { border-radius: var(--radius-sm); }
+.rounded-md { border-radius: var(--radius-md); }
+.rounded-lg { border-radius: var(--radius-lg); }
+.rounded-xl { border-radius: var(--radius-xl); }
+.rounded-full { border-radius: var(--radius-full); }
+
+/* ---- 颜色 ---- */
+.bg-white { background-color: #fff; }
+.bg-primary { background-color: var(--color-primary); }
+.bg-bg { background-color: var(--color-bg); }
+.bg-danger { background-color: var(--color-danger); }
+.bg-success { background-color: var(--color-success); }
+
+.text-primary { color: var(--color-primary); }
+.text-secondary { color: var(--color-text-secondary); }
+.text-tertiary { color: var(--color-text-tertiary); }
+.text-white { color: #fff; }
+.text-danger { color: var(--color-danger); }
+.text-success { color: var(--color-success); }
+
+.text-xs { font-size: var(--font-xs); }
+.text-sm { font-size: var(--font-sm); }
+.text-md { font-size: var(--font-md); }
+.text-lg { font-size: var(--font-lg); }
+.text-xl { font-size: var(--font-xl); }
+.text-2xl { font-size: var(--font-2xl); }
+
+.font-bold { font-weight: 700; }
+.font-semibold { font-weight: 600; }
+.font-medium { font-weight: 500; }
+
+/* ---- 阴影 ---- */
+.shadow-sm { box-shadow: var(--shadow-sm); }
+.shadow-md { box-shadow: var(--shadow-md); }
+.shadow-lg { box-shadow: var(--shadow-lg); }
+
+/* ---- 尺寸 ---- */
+.w-full { width: 100%; }
+.h-full { height: 100%; }
+
+/* ---- 通用按钮 ---- */
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 88rpx;
+  border-radius: var(--radius-md);
+  font-size: var(--font-md);
+  font-weight: 600;
+  border: none;
+  padding: 0 var(--spacing-lg);
+}
+.btn::after { border: none; }
+.btn-primary {
+  background-color: var(--color-primary);
+  color: #fff;
+}
+.btn-danger {
+  background-color: var(--color-danger);
+  color: #fff;
+}
+.btn-outline {
+  background-color: #fff;
+  color: var(--color-primary);
+  border: 2rpx solid var(--color-primary);
+}
+.btn-disabled {
+  opacity: 0.5;
+}
+
+/* 按钮 disabled 状态：灰色 */
+button[disabled] {
+  opacity: 0.5;
+}
+
+/* ---- 通用卡片 ---- */
+.card {
+  background: var(--color-bg-card);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  margin: var(--spacing-sm) var(--spacing-md);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ---- 通用输入框 ---- */
+.input {
+  height: 88rpx;
+  padding: 0 var(--spacing-md);
+  background: var(--color-bg-card);
+  border: 2rpx solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--font-md);
+  color: var(--color-text-primary);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.textarea {
+  min-height: 160rpx;
+  padding: var(--spacing-md);
+  background: var(--color-bg-card);
+  border: 2rpx solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--font-md);
+  color: var(--color-text-primary);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ---- 分隔线 ---- */
+.divider {
+  height: 1rpx;
+  background-color: var(--color-border);
+}
+
+/* ---- 页面容器 ---- */
+.page-container {
+  min-height: 100vh;
+  background-color: var(--color-bg);
+  padding-bottom: var(--spacing-xl);
+}
+
+/* ---- 安全区域 ---- */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* ---- Tag 标签 ---- */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+  font-size: var(--font-xs);
+  font-weight: 500;
+}
+.tag-blue { background: var(--color-primary-light); color: var(--color-primary); }
+.tag-red { background: var(--color-danger-light); color: var(--color-danger); }
+.tag-green { background: var(--color-success-light); color: var(--color-success); }
+.tag-orange { background: var(--color-warning-light); color: var(--color-warning); }
+.tag-gray { background: #F3F4F6; color: var(--color-text-secondary); }
+
+/* ---- 价格显示 ---- */
+.price-primary {
+  color: var(--color-danger);
+  font-weight: 700;
+}
+.price-through {
+  color: var(--color-text-tertiary);
+  text-decoration: line-through;
+}
